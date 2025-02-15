@@ -12,14 +12,17 @@ const saveTask = () => {
   localStorage.setItem("tasks", JSON.stringify(tasks));
 };
 
-const isDuplicate = (title, current = "current") => {
-  return tasks.some(
-    (task) =>
-      task.title.toLowerCase() === title.toLowerCase() && task !== current
-  );
+const isDuplicate = (title, excludeIndex = -1) => {
+  return tasks.some((task, index) => {
+    console.log(task);
+    console.log(index);
+    return (
+      task.title.toLowerCase() === title.toLowerCase() && excludeIndex !== index
+    );
+  });
 };
 
-const render = () => {
+const renderTask = () => {
   const htmls = tasks.map(
     (task, index) => `
   <li class="task-item ${
@@ -54,43 +57,51 @@ const addTask = (e) => {
   };
   tasks.push(newTask);
   saveTask();
-  render();
+  renderTask();
   todoInput.value = "";
 };
 
 const handleTaskList = (e) => {
   const taskItem = e.target.closest(".task-item");
-  const index = taskItem.dataset.index;
-  const taskCurrent = tasks[index];
+  const taskIndex = taskItem.dataset.index;
+  const taskCurrent = tasks[taskIndex];
+
+  console.log(taskCurrent);
 
   if (e.target.closest(".edit")) {
     const newTitle = prompt(`Hãy chỉnh sửa theo ý mình đi!`, taskCurrent.title);
 
     if (!newTitle) return;
 
-    const isDup = isDuplicate(newTitle, taskCurrent);
+    const isDuplicate = tasks.some(
+      (task, index) =>
+        task.title.toUpperCase() === newTitle.toUpperCase() &&
+        task !== taskCurrent
+    );
 
-    if (isDup) return alert("Không được sửa giống nhau!");
+    console.log(isDuplicate);
+
+    if (isDuplicate) return alert("Không được để giống nhau!");
 
     taskCurrent.title = newTitle;
     saveTask();
-    render();
+    renderTask();
     return;
   }
 
   if (e.target.closest(".done")) {
     taskCurrent.completed = !taskCurrent.completed;
     saveTask();
-    render();
+    renderTask();
     return;
   }
 
   if (e.target.closest(".delete")) {
     const author = confirm(`Bạn có muốn xóa ${taskCurrent.title}!`);
     if (author) {
-      tasks.splice(index, 1);
+      tasks.splice(taskIndex, 1);
       saveTask();
-      render();
+      renderTask();
       return;
     }
   }
@@ -99,4 +110,4 @@ const handleTaskList = (e) => {
 todoForm.addEventListener("submit", addTask);
 taskList.addEventListener("click", handleTaskList);
 
-render();
+renderTask();
