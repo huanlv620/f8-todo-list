@@ -1,21 +1,23 @@
-const tasks = [
-  {
-    title: "Design website",
-    completed: false,
-  },
-  {
-    title: "Coding website",
-    completed: true,
-  },
-];
+const tasks = JSON.parse(localStorage.getItem("tasks")) ?? [];
 
 const taskList = document.querySelector("#task-list");
 const todoForm = document.querySelector("#todo-form");
 const todoInput = document.querySelector("#todo-input");
 
-function capitalizeFirstLetter(str) {
+const capitalizeFirstLetter = (str) => {
   return str.charAt(0).toUpperCase() + str.slice(1);
-}
+};
+
+const saveTask = () => {
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+};
+
+const isDuplicate = (title, current = "current") => {
+  return tasks.some(
+    (task) =>
+      task.title.toLowerCase() === title.toLowerCase() && task !== current
+  );
+};
 
 const render = () => {
   const htmls = tasks.map(
@@ -34,25 +36,24 @@ const render = () => {
         </li>
   `
   );
+
   taskList.innerHTML = htmls.join("");
 };
 
 const addTask = (e) => {
   e.preventDefault();
   const newTitle = capitalizeFirstLetter(todoInput.value.trim());
-  const isDuplicate = tasks.some(
-    (task) => task.title.toLowerCase() === newTitle.toLowerCase()
-  );
-  console.log(isDuplicate);
+  const isDup = isDuplicate(newTitle);
 
   if (!newTitle) return alert("Không được để trống!");
-  if (isDuplicate) return alert("Công việc đã tồn tại, vui lòng nhập khác :))");
+  if (isDup) return alert("Công việc đã tồn tại, vui lòng nhập khác :))");
 
   const newTask = {
     title: newTitle,
     completed: false,
   };
   tasks.push(newTask);
+  saveTask();
   render();
   todoInput.value = "";
 };
@@ -63,11 +64,23 @@ const handleTaskList = (e) => {
   const taskCurrent = tasks[index];
 
   if (e.target.closest(".edit")) {
-    console.log("edit");
+    const newTitle = prompt(`Hãy chỉnh sửa theo ý mình đi!`, taskCurrent.title);
+
+    if (!newTitle) return;
+
+    const isDup = isDuplicate(newTitle, taskCurrent);
+
+    if (isDup) return alert("Không được sửa giống nhau!");
+
+    taskCurrent.title = newTitle;
+    saveTask();
+    render();
     return;
   }
+
   if (e.target.closest(".done")) {
     taskCurrent.completed = !taskCurrent.completed;
+    saveTask();
     render();
     return;
   }
@@ -76,6 +89,7 @@ const handleTaskList = (e) => {
     const author = confirm(`Bạn có muốn xóa ${taskCurrent.title}!`);
     if (author) {
       tasks.splice(index, 1);
+      saveTask();
       render();
       return;
     }
