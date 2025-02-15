@@ -57,7 +57,32 @@ const addTask = (e) => {
   todoInput.value = "";
 };
 
+const handleTaskList = (e) => {
+  const taskItem = e.target.closest(".task-item");
+  const index = taskItem.dataset.index;
+  const taskCurrent = tasks[index];
+
+  if (e.target.closest(".edit")) {
+    console.log("edit");
+    return;
+  }
+  if (e.target.closest(".done")) {
+    taskCurrent.completed = !taskCurrent.completed;
+    render();
+    return;
+  }
+
+  if (e.target.closest(".delete")) {
+    const author = confirm(`Bạn có muốn xóa ${taskCurrent.title}!`);
+    if (author) {
+      tasks.splice(index, 1);
+      render();
+      return;
+    }
+  }
+};
+
 todoForm.addEventListener("submit", addTask);
-// taskList.addEventListener("click", handleTaskList);
+taskList.addEventListener("click", handleTaskList);
 
 render();
