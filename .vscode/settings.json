@@ -1,0 +1,15 @@
+{
+    "editor.formatOnSave": true,
+    "editor.fontSize": 16,
+    "workbench.colorTheme": "Dracula Theme",
+    "git.confirmSync": false,
+    "editor.mouseWheelZoom": true,
+    "editor.stickyScroll.enabled": false,
+    "[html]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "liveServer.settings.donotShowInfoMsg": true
+}
