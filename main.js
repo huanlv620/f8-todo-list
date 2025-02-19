@@ -8,14 +8,18 @@ const capitalizeFirstLetter = (str) => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
+function escapeHTML(html) {
+  const div = document.createElement("div");
+  div.innerText = html;
+  return div.innerHTML;
+}
+
 const saveTask = () => {
   localStorage.setItem("tasks", JSON.stringify(tasks));
 };
 
 const isDuplicate = (title, excludeIndex = -1) => {
   return tasks.some((task, index) => {
-    console.log(task);
-    console.log(index);
     return (
       task.title.toLowerCase() === title.toLowerCase() && excludeIndex !== index
     );
@@ -28,7 +32,7 @@ const renderTask = () => {
   <li class="task-item ${
     task.completed ? "completed" : ""
   }" data-index =${index}>
-          <span class="task-title">${task.title}</span>
+          <span class="task-title">${escapeHTML(task.title)}</span>
           <div class="task-action">
             <button class="task-btn edit">Edit</button>
             <button class="task-btn done">${
@@ -66,8 +70,6 @@ const handleTaskList = (e) => {
   const taskIndex = taskItem.dataset.index;
   const taskCurrent = tasks[taskIndex];
 
-  console.log(taskCurrent);
-
   if (e.target.closest(".edit")) {
     const newTitle = prompt(`Hãy chỉnh sửa theo ý mình đi!`, taskCurrent.title);
 
@@ -78,8 +80,6 @@ const handleTaskList = (e) => {
         task.title.toUpperCase() === newTitle.toUpperCase() &&
         task !== taskCurrent
     );
-
-    console.log(isDuplicate);
 
     if (isDuplicate) return alert("Không được để giống nhau!");
 
